@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>مشغل الفيديو بطريقة Reels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Caveat:wght@400..700&family=Jersey+20+Charted&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #fff;
+            height: 100vh;
+            font-family: "Rubik", sans-serif;
+        }
+
+		.loading-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .swiper-container {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-page">
+        <p>Loading...</p>
+    </div>
+
+    <div class="swiper-container" id="content" style="display: none;">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <h2>مرر لأعلى</h2>
+            </div>
+            {% for video in videos %}
+		        <div class="swiper-slide">
+		            <video src="{{ video }}" controls loop></video>
+		        </div>
+		    {% endfor %}
+            <div class="swiper-slide">
+                <h2>وصلنا للنهاية</h2>
+            </div>،
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            direction: 'vertical',
+            slidesPerView: 1,
+            spaceBetween: 0,
+            mousewheel: true,
+            keyboard: true,
+            on: {
+                slideChange: function() {
+                    stopAllVideos();
+                    playCurrentVideo();
+                },
+            },
+        });
+
+        function stopAllVideos() {
+            var videos = document.querySelectorAll('video');
+            videos.forEach(function(video) {
+                video.pause();
+            });
+        }
+
+        function playCurrentVideo() {
+            var currentSlide = swiper.slides[swiper.activeIndex];
+            var video = currentSlide.querySelector('video');
+            if (video) {
+                video.play();
+            }
+        }
+
+        function loadNextVideo() {
+            var nextSlide = swiper.slides[swiper.activeIndex + 1];
+            var video = nextSlide.querySelector('video');
+            if (video && video.dataset.loaded === 'false') {
+                video.load();
+                video.dataset.loaded = 'true';
+            }
+        }
+
+        // عرض المحتوى بعد التحميل
+        window.addEventListener('load', function() {
+            document.getElementById('content').style.display = 'block';
+            document.querySelector('.loading-page').style.display = 'none';
+            loadNextVideo();
+        });
+
+    </script>
+</body>
+</html>
